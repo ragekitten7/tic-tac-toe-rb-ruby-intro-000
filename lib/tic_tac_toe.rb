@@ -9,7 +9,7 @@ WIN_COMBINATIONS = [
   [6, 4, 2]
 ]
 
-  def display_board(board)
+def display_board(board)
   puts " #{board[0]} | #{board[1]} | #{board[2]} "
   puts "-----------"
   puts " #{board[3]} | #{board[4]} | #{board[5]} "
@@ -18,54 +18,53 @@ WIN_COMBINATIONS = [
 end
 
 def input_to_index(user_input)
-  index = user_input.to_i
-  index -= 1
-  return index
+  user_input.to_i - 1
 end
 
-
-def move(board, index, current_player = "X")
+def move(board, index, current_player)
   board[index] = current_player
 end
 
 def position_taken?(board, index)
-   if (board[index] == " ") || (board[index] == "") || (board[index] == nil)
-      return false
-   else
-      return true
-   end
+  !(board[index].nil? || board[index] == " ")
 end
 
 def valid_move?(board, index)
-   if index.between?(0,8) && !position_taken?(board, index)
-      return true
-   end
+  index.between?(0,8) && !position_taken?(board, index)
+end
+
+def turn_count(board)
+  turn = 0
+  board.each do |index|
+    if index == "X" || index == "O"
+      turn += 1
+    end
+  end
+  return turn
+end
+
+def current_player(board)
+  #if the turn count is an even number, that means O just went, so the next/current player is X
+  num_turns = turn_count(board)
+  if num_turns % 2 == 0
+    player = "X"
+  else
+    player = "O"
+  end
+  return player
 end
 
 def turn(board)
-  puts "Please enter 1-9:"
-  num = gets.chomp
-  index = input_to_index(num)
-  if valid_move?(board, index) == true
-    move(board, index)
+  puts "Please choose a number 1-9:"
+  user_input = gets.chomp
+  index = input_to_index(user_input)
+  if valid_move?(board, index)
+    player_token = current_player(board)
+    move(board, index, player_token)
     display_board(board)
   else
     turn(board)
   end
-end
-
-def turn_count(board)
-   counter = 0
-   board.each do |spaces|
-      if spaces == "X" || spaces == "O"
-         counter += 1
-      end
-   end
-   counter
-end
-
-def current_player(board)
-   turn_count(board) % 2 == 0 ? "X" : "O"
 end
 
 def won?(board)
@@ -100,7 +99,7 @@ def draw?(board)
 end
 
 def over?(board)
-  if won?(board) || full?(board) || draw?(board)
+  if won?(board) || draw?(board)
     return true
   else
     return false
@@ -122,13 +121,13 @@ def winner (board)
 end
 
 def play(board)
-   until over?(board)
-      turn(board)
-   end
+  until over?(board) == true
+    turn(board)
+  end
+
   if won?(board)
-    winner(board) == "X" || winner(board) == "O"
-    puts "Congratulations #{winner}!"
-  elsif draw?
-    puts "Cat's Game!"
+    puts "Congratulations #{winner(board)}!"
+  elsif draw?(board)
+    puts "Cats Game!"
   end
 end
